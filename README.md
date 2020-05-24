@@ -1,6 +1,6 @@
 # 이니시스 - 가상 계좌번호(채번)
 
-회사에서 가상 계좌번호 채번 및 입금여부 확인을 위해, 이니시스 API를 사용하게 되었다. 처음하는 작업이기에, 아래에 따로 정리해본다. (문서에 일부 내용을 가져와, 내가 이해한 내용에 대한 설명을 붙였다.)
+ 회사에서 가상 계좌번호 채번 및 입금여부 확인을 위해, 이니시스 API를 사용하게 되었다. 처음하는 작업이기에, 아래에 따로 정리해본다. (문서에 일부 내용을 가져와, 내가 이해한 내용에 대한 설명을 붙였다.)
 
 
 
@@ -98,6 +98,60 @@ public String generateVacctReqHashData(VacctReqDto vacctReqDto) throws Exception
 상점관리자 페이지에 로그인 후, [ 통보 URL ]로 데이터를 얻는다.
 
 (아직 상점관리자 페이지에 로그인을 하지 못하므로, 추후 상세 내역을 업데이트할 예정이다. )
+
+
+
+## JAVA 내부에서 API 요청
+
+- 나는 JAVA 내부에서 API를 요청하기 위해, SPRING에서 제공해주는 <code>RestTemplate</code>를 사용하였다.
+
+- header에 <code>Content-type</code>, <code>charset</code>를 추가하기 위해  <code>HttpHeaders</code>를 이용하였다.
+
+```java
+/**
+ * 이니시스 API: 계좌번호 채번
+ * POST /api/v1/formpay HTTP/1.1
+ * Host: iniapi.inicis.com
+ * Content-type: application/x-www-form-urlencoded;charset=utf-8
+ * @param vacctReqDto   요청 데이터
+ */
+public String createVirtualAccount(VacctReqDto vacctReqDto) {
+    String url = "/api/v1/formpay";
+
+    RestTemplate restTemplate = new RestTemplate();
+    String response = null;
+    try {
+        vacctReqDto.setUrl(SITE_URL);
+        vacctReqDto.setType("Pay");
+        vacctReqDto.setPaymethod("Vacct");
+        vacctReqDto.setTimestamp(SignatureUtil.getTimestamp());
+        vacctReqDto.setClientIp(InetAddress.getLocalHost().getHostAddress());
+        vacctReqDto.setMid(MID);
+        vacctReqDto.setMoid(MID + "_" + SignatureUtil.getTimestamp());
+        vacctReqDto.setHashData(generateVacctReqHashData(vacctReqDto));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/x-www-form-urlencoded");
+        headers.add("charset", "utf-8");
+
+        response = restTemplate.exchange(
+            buildVacctReqUri(vacctReqDto, HOST + url),
+            HttpMethod.POST,
+            new HttpEntity<>(headers),
+            String.class).toString();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return response;
+}
+```
+
+
+
+
+
+
 
 
 
