@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>이니시스 - 가상 계좌번호(채번)</title>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+</head>
+<body>
+    <h1>이니시스 - 가상 계좌번호(채번)</h1>
+    <form name="vacct" id="vacct">
+        <label for="goodName">상품명:<input type="text" name="goodName" id="goodName" readonly value="계약금" /></label><br />
+        <label for="price">결제금액: <input type="text" name="price" id="price" readonly value="1000000" /></label><br />
+        <label for="buyerName">구매자명: <input type="text" name="buyerName" id="buyerName" readonly value="이택준" /></label><br />
+        <label for="buyerEmail">구매자 이메일: <input type="text" name="buyerEmail" id="buyerEmail" readonly value="selectjun@gmail.com" /></label><br />
+        <label for="buyerTel">구매자 연락처: <input type="text" name="buyerTel" id="buyerTel" readonly value="01012345678" /></label><br />
+        <label for="bankCode">은행코드: <input type="text" name="bankCode" id="bankCode" readonly value="06" /></label><br />
+        <label for="dtInput">입금예정일자(YYYYMMDD): <input type="text" name="dtInput" id="dtInput" readonly value="202000601" /></label><br />
+        <label for="tmInput">입금예정시간(HHMM): <input type="text" name="tmInput" id="tmInput" readonly value="0000" /></label><br />
+        <label for="nmInput">입금자명: <input type="text" name="nmInput" id="nmInput" readonly value="이택준" /></label><br />
+        <button type="button" name="vacctBtn" id="vacctBtn">구매</button>
+        <div id="result"></div>
+    </form>
+    <script>
+        $("#vacctBtn").click(function() {
+            $.ajax({
+                url: "/vacct",
+                type: "post",
+                cache: false,
+                data: $(document.vacct).serialize(),
+                success: function(data){
+                    $("#result").html(data);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
