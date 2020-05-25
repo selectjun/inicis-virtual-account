@@ -1,4 +1,4 @@
-package com.inisis.vacct.dto;
+package com.inicis.vacct.dto;
 
 public class VacctReqDto {
 

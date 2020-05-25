@@ -1,4 +1,4 @@
-package com.inisis.vacct.utils;
+package com.inicis.vacct.utils;
 
 import org.springframework.stereotype.Component;
 

@@ -1,10 +1,10 @@
-package com.inisis.vacct.service;
+package com.inicis.vacct.service;
 
 import java.net.InetAddress;
 
-import com.inisis.vacct.dto.VacctReqDto;
-import com.inisis.vacct.utils.Crypt;
-import com.inisis.vacct.utils.SignatureUtil;
+import com.inicis.vacct.dto.VacctReqDto;
+import com.inicis.vacct.utils.Crypt;
+import com.inicis.vacct.utils.SignatureUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
