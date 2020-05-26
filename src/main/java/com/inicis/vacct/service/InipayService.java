@@ -1,6 +1,7 @@
 package com.inicis.vacct.service;
 
 import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 
 import com.inicis.vacct.dto.VacctReqDto;
 import com.inicis.vacct.utils.Crypt;
@@ -11,9 +12,11 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
 
 @Service
 @PropertySource("classpath:application.properties")
@@ -59,15 +62,24 @@ public class InipayService {
             vacctReqDto.setMoid(MID + "_" + SignatureUtil.getTimestamp());
             vacctReqDto.setHashData(generateVacctReqHashData(vacctReqDto));
 
+            System.out.print("Request URL: ");
+            System.out.println(buildVacctReqUri(vacctReqDto, HOST + url));
+
             HttpHeaders headers = new HttpHeaders();
             headers.add("Content-Type", "application/x-www-form-urlencoded");
             headers.add("charset", "utf-8");
+
+            restTemplate.getMessageConverters()
+                    .add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
 
             response = restTemplate.exchange(
                     buildVacctReqUri(vacctReqDto, HOST + url),
                     HttpMethod.POST,
                     new HttpEntity<>(headers),
-                    String.class).toString();
+                    String.class).getBody();
+
+            System.out.print("Response: ");
+            System.out.println(response);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -96,7 +108,7 @@ public class InipayService {
      * @param requestUrl    요청 URL
      */
     public String buildVacctReqUri(VacctReqDto vacctReqDto, String requestUrl) {
-        return UriComponentsBuilder.fromHttpUrl(requestUrl)
+        String url = UriComponentsBuilder.fromHttpUrl(requestUrl)
                 .queryParam("type", vacctReqDto.getType())
                 .queryParam("paymethod", vacctReqDto.getPaymethod())
                 .queryParam("timestamp", vacctReqDto.getTimestamp())
@@ -117,7 +129,10 @@ public class InipayService {
                 .queryParam("flgCash", vacctReqDto.getFlgCash())
                 .queryParam("cashRegNo", vacctReqDto.getCashRegNo())
                 .queryParam("hashData", vacctReqDto.getHashData())
+                .build()
+                .encode(StandardCharsets.UTF_8)
                 .toUriString();
+        return UriUtils.decode(url, "UTF-8");
     }
 
 }
